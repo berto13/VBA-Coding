@@ -1,0 +1,153 @@
+'2. ACCESS DATABASE DATA SCRAPER
+
+'Option Compare Database
+
+Private Sub Command11_Click()
+
+Dim MyXL As Object
+
+Set MyXL = CreateObject("Excel.Application")
+With MyXL
+    .Application.Visible = True
+    .Workbooks.Open "L:\WWSSLA\LaBilling\RPCPROD\Argentina\SEBILL PROD\Acreedias\Acreedias_DB\dividend_charges.xlsx"
+End With
+End Sub
+
+Private Sub Command14_Click()
+
+Dim MyXL As Object
+
+Set MyXL = CreateObject("Excel.Application")
+With MyXL
+    .Application.Visible = True
+    .Workbooks.Open "L:\WWSSLA\LaBilling\RPCPROD\Argentina\SEBILL PROD\Acreedias\Acreedias_DB\safekeeping_no_charge.xlsx"
+End With
+End Sub
+
+Private Sub Command7_Click()
+
+DoCmd.SetWarnings False DoCmd.OpenQuery "qry_delete_tbl_scrape", acViewNormal, acEdit
+
+'------- ' Get the main system object Dim Sessions As Object Dim System As Object Set System = CreateObject("EXTRA.System") ' Gets the system object If (System Is Nothing) Then MsgBox "Could not create the EXTRA System object. Stopping macro playback." Stop End If Set Sessions = System.Sessions
+
+If (Sessions Is Nothing) Then
+    MsgBox "Could not create the Sessions collection object.  Stopping macro playback."
+    Stop
+End If
+'------ ' Set the default wait timeout value g_HostSettleTime = 50 ' milliseconds
+
+OldSystemTimeout& = System.TimeoutValue
+If (g_HostSettleTime > OldSystemTimeout) Then
+    System.TimeoutValue = g_HostSettleTime
+End If
+' Get the necessary Session Object Dim Sess0 As Object Set Sess0 = System.ActiveSession If (Sess0 Is Nothing) Then MsgBox "Could not create the Session object. Stopping macro playback." Stop End If If Not Sess0.Visible Then Sess0.Visible = True Sess0.Screen.WaitHostQuiet (g_HostSettleTime)
+
+'** Prepare the database:
+
+Dim db As Database, rs As Recordset, rs2 As Recordset Dim i As Integer Dim opening_balance As String Dim trans_ref As String Dim trcd As String Dim customer_reference As String Dim tran_amount As String Dim settle_date As String Dim Drcr As String Dim broker As String Dim status As String Dim closing_balance As String Dim a As Integer Dim b As Integer Dim debit_account_number As String Dim credit_account_number As String Dim ccy As String Dim amount As String Dim Payment_method As String Dim customer_ref As String Dim instructed_on As String Dim value_date As String Dim free_text1 As String Dim free_text2 As String Dim free_text3 As String Dim debit_ccy_amount As String Dim credit_ccy_amount As String Dim exchange_rate As String Dim TIME_STARTED, TIME_COMPLETED Dim ACCOUNTS_OK, ACCOUNTS_ERR
+
+TIME_STARTED = Time()
+
+Set db = CurrentDb Set rs = db.OpenRecordset("tbl_scrape")
+
+'rs.MoveLast
+
+'txtTotRecs = rs.RecordCount
+
+'rs.AddNew
+
+DoEvents
+
+If (Sess0.Screen.getstring(1, 33, 4)) = "HIST" Then GoTo de_NUEVO Else MsgBox "INCORRECT HOST SCREEN, PLEASE TRY AGAIN" GoTo FINAL End If
+
+de_NUEVO:
+
+For a = 7 To 17
+
+'** Start the main loop:
+
+    rs.AddNew
+    
+    Sess0.Screen.MoveTo a, 2
+            
+    If (Sess0.Screen.getstring(a, 73, 3)) = "SET" Then
+    GoTo siguiente
+    Else
+    End If
+    
+    If (Sess0.Screen.getstring(a, 17, 3)) = "800" Then
+    GoTo comenzar
+    Else
+    If (Sess0.Screen.getstring(a, 17, 3)) = "900" Then
+    GoTo comenzar
+    Else
+    GoTo FINAL
+    End If
+    End If
+comenzar: rs!opening_balance = LTrim(Sess0.Screen.getstring(3, 57, 24)) rs!trans_ref = Sess0.Screen.getstring(a, 5, 11) rs!trcd = Sess0.Screen.getstring(a, 17, 3) rs!customer_reference = Sess0.Screen.getstring(a, 22, 16) rs!tran_amount = LTrim(Sess0.Screen.getstring(a, 55, 26)) rs!settle_date = Sess0.Screen.getstring(a + 1, 5, 11) rs!Drcr = Sess0.Screen.getstring(a + 1, 18, 1) rs!broker = Sess0.Screen.getstring(a + 1, 28, 39) rs!status = Sess0.Screen.getstring(a + 1, 69, 7) rs!closing_balance = LTrim(Sess0.Screen.getstring(19, 57, 24))
+
+    If (Sess0.Screen.getstring(a, 17, 3)) = "800" Then
+    GoTo pago_local
+    Else
+    GoTo fx
+    End If
+pago_local: Sess0.Screen.SendKeys ("ds") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 23, 10 rs!debit_account_number = Sess0.Screen.getstring(6, 23, 10) rs!credit_account_number = Sess0.Screen.getstring(7, 23, 10) rs!ccy = Sess0.Screen.getstring(8, 23, 3) rs!amount = LTrim(Sess0.Screen.getstring(9, 23, 24)) rs!Payment_method = Sess0.Screen.getstring(10, 23, 2) rs!customer_ref = Sess0.Screen.getstring(12, 23, 24) rs!instructed_on = Sess0.Screen.getstring(13, 23, 11) rs!value_date = Sess0.Screen.getstring(14, 23, 11) rs!free_text1 = RTrim(Sess0.Screen.getstring(14, 23, 50)) rs!free_text2 = RTrim(Sess0.Screen.getstring(15, 23, 50)) rs!free_text3 = RTrim(Sess0.Screen.getstring(16, 23, 50)) Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("ret") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitForCursor 7, 2 rs.Update GoTo siguiente
+
+fx: Sess0.Screen.SendKeys ("ds") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 23, 10 rs!debit_account_number = Sess0.Screen.getstring(6, 23, 10) rs!debit_ccy_amount = RTrim(Sess0.Screen.getstring(7, 23, 25)) rs!credit_account_number = Sess0.Screen.getstring(8, 23, 10) rs!credit_ccy_amount = RTrim(Sess0.Screen.getstring(9, 23, 25)) 'rs!ccy = Sess0.Screen.GetString(8, 23, 3) rs!customer_ref = RTrim(Sess0.Screen.getstring(12, 23, 24)) rs!instructed_on = Sess0.Screen.getstring(13, 23, 11) rs!value_date = Sess0.Screen.getstring(16, 23, 11) rs!free_text1 = RTrim(Sess0.Screen.getstring(18, 23, 50)) rs!free_text2 = RTrim(Sess0.Screen.getstring(19, 23, 50)) 'rs!free_text3 = RTrim(Sess0.Screen.GetString(16, 23, 50)) Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("ret") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitForCursor 7, 2 rs.Update GoTo siguiente
+
+siguiente:
+
+Next a
+
+Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("nxt") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 7, 2
+
+GoTo next_pages 'End If
+
+next_pages:
+
+For b = 9 To 17
+
+'** Start the main loop:
+
+    rs.AddNew
+    
+    Sess0.Screen.MoveTo b, 2
+            
+    If (Sess0.Screen.getstring(b, 73, 3)) = "SET" Then
+    GoTo siguiente1
+    Else
+    End If
+    
+    If (Sess0.Screen.getstring(b, 17, 3)) = "800" Then
+    GoTo comenzar1
+    Else
+    If (Sess0.Screen.getstring(b, 17, 3)) = "900" Then
+    GoTo comenzar1
+    Else
+    GoTo FINAL
+    End If
+    End If
+comenzar1: rs!opening_balance = LTrim(Sess0.Screen.getstring(3, 57, 24)) rs!trans_ref = Sess0.Screen.getstring(b, 5, 11) rs!trcd = Sess0.Screen.getstring(b, 17, 3) rs!customer_reference = Sess0.Screen.getstring(b, 22, 16) rs!tran_amount = LTrim(Sess0.Screen.getstring(b, 55, 26)) rs!settle_date = Sess0.Screen.getstring(b + 1, 5, 11) rs!Drcr = Sess0.Screen.getstring(b + 1, 18, 1) rs!broker = Sess0.Screen.getstring(b + 1, 28, 39) rs!status = Sess0.Screen.getstring(b + 1, 69, 7) rs!closing_balance = LTrim(Sess0.Screen.getstring(19, 57, 24))
+
+    If (Sess0.Screen.getstring(b, 17, 3)) = "800" Then
+    GoTo pago_local1
+    Else
+    GoTo fx1
+    End If
+pago_local1: Sess0.Screen.SendKeys ("ds") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 23, 10 rs!debit_account_number = Sess0.Screen.getstring(6, 23, 10) rs!credit_account_number = Sess0.Screen.getstring(7, 23, 10) rs!ccy = Sess0.Screen.getstring(8, 23, 3) rs!amount = LTrim(Sess0.Screen.getstring(9, 23, 24)) rs!Payment_method = Sess0.Screen.getstring(10, 23, 2) rs!customer_ref = Sess0.Screen.getstring(12, 23, 24) rs!instructed_on = Sess0.Screen.getstring(13, 23, 11) rs!value_date = Sess0.Screen.getstring(14, 23, 11) rs!free_text1 = RTrim(Sess0.Screen.getstring(14, 23, 50)) rs!free_text2 = RTrim(Sess0.Screen.getstring(15, 23, 50)) rs!free_text3 = RTrim(Sess0.Screen.getstring(16, 23, 50)) Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("ret") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitForCursor 7, 2 rs.Update GoTo siguiente1
+
+fx1: Sess0.Screen.SendKeys ("ds") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 23, 10 rs!debit_account_number = Sess0.Screen.getstring(6, 23, 10) rs!debit_ccy_amount = RTrim(Sess0.Screen.getstring(7, 23, 25)) rs!credit_account_number = Sess0.Screen.getstring(8, 23, 10) rs!credit_ccy_amount = RTrim(Sess0.Screen.getstring(9, 23, 25)) 'rs!ccy = Sess0.Screen.GetString(8, 23, 3) rs!customer_ref = RTrim(Sess0.Screen.getstring(12, 23, 24)) rs!instructed_on = Sess0.Screen.getstring(13, 23, 11) rs!value_date = Sess0.Screen.getstring(16, 23, 11) rs!free_text1 = RTrim(Sess0.Screen.getstring(18, 23, 50)) rs!free_text2 = RTrim(Sess0.Screen.getstring(19, 23, 50)) 'rs!free_text3 = RTrim(Sess0.Screen.GetString(16, 23, 50)) Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("ret") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitForCursor 7, 2 rs.Update GoTo siguiente1
+
+siguiente1:
+
+Next b
+
+Sess0.Screen.MoveTo 23, 10 Sess0.Screen.SendKeys ("nxt") Sess0.Screen.SendKeys ("") Sess0.Screen.WaitHostQuiet (g_HostSettleTime) Sess0.Screen.WaitForCursor 7, 2
+
+GoTo next_pages
+
+FINAL: rs.Close TIME_COMPLETED = Time() MsgBox "FIN DE PROCESO !!!!" & Chr(10) & _ " " & Chr(10) & _ "STARTED: " & TIME_STARTED & " COMPLETED: " & TIME_COMPLETED
+
+Exit_COMMAND7_Click: Exit Sub
+
+End Sub

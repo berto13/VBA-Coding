@@ -1,0 +1,246 @@
+'5. DERIVATIVES ADJUSTMENTS
+
+Sub Run_All_Dervs()
+
+Dim strDataRange As Range 
+Dim keyRange As Range
+Dim ReportingEnt As String 
+Dim CounterEnt As String 
+Dim TabName As String 
+Dim ToNext As Integer 
+Dim TabNum As Integer 
+Dim FirstCell As Integer
+
+Application.ScreenUpdating = False 
+
+FirstCell = 1017 
+ToNext = FirstCell 
+ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext)
+TabName = "O.1 - Master Derivatives Data" TabNum = 0
+
+Do Until (TabNum = 2) 
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext)
+
+	'USD 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="USD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") 
+		strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy 
+		ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1
+	Loop
+
+	'AUD 
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="AUD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1 
+	Loop
+
+	'GBP 
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="AUD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1 
+	Loop
+
+	'EUR
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="AUD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1 
+	Loop
+
+	'JPY 
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="AUD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1 
+	Loop
+
+	'CHF 
+	ToNext = FirstCell 
+	ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+	CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+	Do Until (ReportingEnt = "") 
+		ReportingEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("N" & ToNext) 
+		CounterEnt = ActiveWorkbook.Sheets("Derivatives Adjs").Range("O" & ToNext) 
+		ActiveWorkbook.Sheets(TabName).Activate 
+		Lastrow = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row 
+		ActiveSheet.Range("A1").Select 
+		Selection.AutoFilter 
+		Selection.AutoFilter Field:=47, Criteria1:=ReportingEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=48, Criteria1:=CounterEnt, Operator:=xlFilterValues 
+		Selection.AutoFilter Field:=49, Criteria1:="AUD", Operator:=xlFilterValues 
+
+		'Filter by CCY 
+		Set strDataRange = ActiveSheet.Range("A1:BB" & Lastrow) 
+		Set keyRange = ActiveSheet.Range("A1") strDataRange.SpecialCells(xlCellTypeVisible).Select 
+		Selection.Copy ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+		ActiveSheet.Range("B1").Select 
+		Selection.PasteSpecial xlPasteValues 
+		Application.Run "Module5.Export_Dervs_Adjs_NoBox" 
+		ToNext = ToNext + 1 
+	Loop
+
+	TabName = "O.2 - Master Derivatives Data" 
+	TabNum = TabNum + 1 
+Loop
+
+MsgBox "Derivatives Adjustments Completed Successfully!", vbInformation, "Done!"
+
+End Sub
+----------------------------------------------------------------------------------------
+
+Sub Export_Dervs_Adjs_NoBox()
+
+Dim wsSheet1 As Worksheet
+Dim wsSheet2 As Worksheet 
+
+'Inflow Adjustments 
+ActiveSheet.Range("$A$1103:$R$1143").AutoFilter Field:=8, Criteria1:=">0.01", Operator:=xlAnd 
+On Error Resume Next 
+ActiveSheet.Range("$A$1104:$R$1143").SpecialCells(xlCellTypeVisible).Copy 
+ 
+
+On Error Resume Next 
+Set wsSheet1 = Sheets("Dervs Inflows - Temp") 
+On Error Resume Next 
+If wsSheet1 Is Nothing Then 
+	Sheets.Add.Name = "Dervs Inflows - Temp" 
+End If
+
+ActiveWorkbook.Sheets("Dervs Inflows - Temp").Activate
+
+If Range("A1") = "" Then 
+	Range("A1").Select 
+Else 
+	ActiveSheet.Range("A1").End(xlDown).Offset(1, 0).Select 
+End If
+
+Selection.PasteSpecial xlPasteValues
+
+'Outflow Adjustments 
+ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+ActiveSheet.Range("$A$1103:$R$1143").AutoFilter
+ActiveSheet.Range("$A$1145:$R$1185").AutoFilter Field:=8, Criteria1:=">0.01", Operator:=xlAnd 
+ActiveSheet.Range("$A$1146:$R$1185").SpecialCells(xlCellTypeVisible).Copy 
+
+
+On Error Resume Next 
+Set wsSheet2 = Sheets("Dervs Outflows - Temp") 
+On Error Resume Next 
+If wsSheet2 Is Nothing Then 
+	Sheets.Add.Name = "Dervs Outflows - Temp" 
+End If
+
+ActiveWorkbook.Sheets("Dervs Outflows - Temp").Activate
+
+If Range("A1") = "" Then 
+	Range("A1").Select 
+Else 
+	ActiveSheet.Range("A1").End(xlDown).Offset(1, 0).Select 
+End If
+
+Selection.PasteSpecial xlPasteValues
+
+ActiveWorkbook.Sheets("Derivatives Adjs").Activate 
+ActiveSheet.Range("$A$1145:$R$1185").AutoFilter
+
+Range("B1:BD1015").Select
+Selection.ClearContents
+Range("B2").Select
+Selection.End(xlUp).Select
+
+
+End Sub

@@ -1,0 +1,480 @@
+'3. DATA ORGANIZER - REPORT
+
+Private Sub CommandButton2_Click()
+
+'Variable Declaration
+Dim strDataRange As Range 
+Dim keyRange As Range
+Dim TabName As String 
+Dim RowNum As Integer 
+Dim Entity As String 
+Dim Entity2 As String
+Dim SFX1 As String 
+Dim SFX2 As String 
+Dim SFX3 As String 
+
+SFX1 = ActiveWorkbook.Sheets("Summary").Range("K2") 
+SFX2 = ActiveWorkbook.Sheets("Summary").Range("K3") 
+SFX3 = ActiveWorkbook.Sheets("Summary").Range("K4")
+
+Entity = ActiveWorkbook.Sheets("Summary").Range("C9") 
+Entity2 = ActiveWorkbook.Sheets("Summary").Range("J9") RowNum = 1
+
+TabName = ActiveWorkbook.Sheets("Summary").Range("A1").Offset(RowNum, 0).Value
+
+Application.ScreenUpdating = False
+
+ActiveWorkbook.Sheets(TabName).Activate 
+Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+
+'PID Tab 
+Do Until Not IsEmpty(Sheets(TabName).Range("E1").Value)
+
+    ActiveSheet.Range("D1:D2").Copy
+    ActiveSheet.Range("E1").Select
+    ActiveSheet.Paste
+    ActiveSheet.Range("E1").Value = "ABS Variance"
+    ActiveSheet.Range("E2").Formula = "=ABS(D2)"
+
+   'Application.ScreenUpdating = False
+
+    ActiveSheet.Range("E2").Copy
+    ActiveSheet.Cells(Rows.Count, 2).End(xlUp).Offset(0, 3).Select
+    ActiveSheet.Range(Selection, Selection.End(xlUp)).Select
+    ActiveSheet.Paste
+
+   'PID Filter Entity1
+
+    Set strDataRange = ActiveSheet.Range("A1:E" & Lastrow)
+    Set keyRange = ActiveSheet.Range("E1")
+    strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+    strDataRange.Select
+    Selection.AutoFilter
+    If Entity = "All" Then
+        Selection.AutoFilter
+    Else
+        Selection.AutoFilter Field:=1, Criteria1:=Entity 'column A
+    End If
+Loop
+
+'PID Filter if already formatted
+Set strDataRange = ActiveSheet.Range("A1:E" & Lastrow)
+Set keyRange = ActiveSheet.Range("E1")
+strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+strDataRange.Select
+Selection.AutoFilter
+If Entity = "All" Then
+    Selection.AutoFilter
+Else
+    Selection.AutoFilter Field:=1, Criteria1:=Entity 'column A
+End If
+
+'CopyPaste data into Temp sheet and then into Summary tab
+
+Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+Set keyRange = ActiveSheet.Range("F1")
+strDataRange.SpecialCells(xlCellTypeVisible).Select
+Selection.Copy
+ActiveWorkbook.Sheets("TempSheet").Activate
+ActiveSheet.Range("A1").Select
+ActiveSheet.Paste
+        
+If SFXChkBox.Value = True Then
+    Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+    Set strDataRange = ActiveSheet.Range("A2:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    strDataRange.SpecialCells(xlCellTypeVisible).Select
+    Selection.EntireRow.Delete
+    ActiveSheet.Range("A1").Select
+    Selection.AutoFilter
+End If
+
+If OtherPidExcl.Value = True Then
+    Application.Run "Module1.AdditionalExclusions"
+End If
+    
+ActiveSheet.Range("A2:D41").Copy
+ActiveWorkbook.Sheets("Summary").Activate
+Range("A14").PasteSpecial xlPasteValues
+Set strDataRange = ActiveSheet.Range("A14:F53")
+Set keyRange = ActiveSheet.Range("B13")
+strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+
+ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+
+'PID Entity2 Filter
+ActiveWorkbook.Sheets(TabName).Activate
+Set strDataRange = ActiveSheet.Range("A1:E" & Lastrow)
+Set keyRange = ActiveSheet.Range("E1")
+Selection.AutoFilter
+strDataRange.Select
+Selection.AutoFilter
+If Entity2 = "All" Then
+    Selection.AutoFilter
+Else
+    Selection.AutoFilter Field:=1, Criteria1:=Entity2 'column A
+End If
+'CopyPaste data into Temp sheet and then into Summary tab
+Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+Set keyRange = ActiveSheet.Range("F1")
+strDataRange.SpecialCells(xlCellTypeVisible).Select
+Selection.Copy
+        
+ActiveWorkbook.Sheets("TempSheet").Activate
+ActiveSheet.Range("A1").Select
+ActiveSheet.Paste
+        
+If SFXChkBox.Value = True Then
+    Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+    Set strDataRange = ActiveSheet.Range("A2:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    strDataRange.SpecialCells(xlCellTypeVisible).Select
+    Selection.EntireRow.Delete
+    ActiveSheet.Range("A1").Select
+    Selection.AutoFilter
+End If
+        
+If OtherPidExcl.Value = True Then
+    Application.Run "Module1.AdditionalExclusions"
+End If
+    
+ActiveSheet.Range("A2:D41").Copy
+ActiveWorkbook.Sheets("Summary").Activate
+Range("H14").PasteSpecial xlPasteValues
+Set strDataRange = ActiveSheet.Range("H14:M53")
+Set keyRange = ActiveSheet.Range("I13")
+strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+
+RowNum = RowNum + 1
+TabName = ActiveWorkbook.Sheets("Summary").Range("A1").Offset(RowNum, 0).Value
+'End of PID Tab
+
+'All Other Tabs 
+Do Until (RowNum = 8)
+
+    ActiveWorkbook.Sheets(TabName).Activate
+
+   'For Maturity Tab Only
+    If TabName = "Maturity " Then
+
+        If ActiveWorkbook.Sheets(TabName).Range("G1").Value = "" Then
+            Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+        
+            ActiveSheet.Range("F1:F2").Copy
+            ActiveSheet.Range("G1").Select
+            ActiveSheet.Paste
+            ActiveSheet.Range("G1").Value = "ABS Total Variance"
+            ActiveSheet.Range("G2").Formula = "=ABS(D2+E2+F2)"
+
+        'Application.ScreenUpdating = False
+
+            ActiveSheet.Range("G2").Copy
+            ActiveSheet.Cells(Rows.Count, 2).End(xlUp).Offset(0, 5).Select
+            ActiveSheet.Range(Selection, Selection.End(xlUp)).Select
+            ActiveSheet.Paste
+
+        End If
+    
+   'Maturity Entity1 Filter
+    ActiveSheet.Range("A1").Select
+    Selection.AutoFilter
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    Set strDataRange = ActiveSheet.Range("A1:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+    Selection.AutoFilter
+    strDataRange.Select
+    Selection.AutoFilter
+    If Entity = "All" Then
+        Selection.AutoFilter
+    Else
+        Selection.AutoFilter Field:=1, Criteria1:=Entity, Field:=4, Criteria1:="<>" 'column A
+    End If
+        
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    Set strDataRange = ActiveSheet.Range("A1:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    strDataRange.SpecialCells(xlCellTypeVisible).Select
+    Selection.Copy
+    ActiveWorkbook.Sheets("TempSheet").Activate
+    ActiveSheet.Range("A1").Select
+    ActiveSheet.Paste
+    Set strDataRange = ActiveSheet.Range("A2:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+
+    If SFXChkBox.Value = True Then
+        Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+        strDataRange.SpecialCells(xlCellTypeVisible).Select
+        Selection.EntireRow.Delete
+        ActiveSheet.Range("A1").Select
+        Selection.AutoFilter
+    End If
+     
+    If OtherPidExcl.Value = True Then
+        Application.Run "Module1.AdditionalExclusions"
+    End If
+        
+    ActiveSheet.Range("A2:F41").Copy
+    ActiveWorkbook.Sheets("Summary").Activate
+    Range("A60").PasteSpecial xlPasteValues
+    Set strDataRange = ActiveSheet.Range("A60:F99")
+    Set keyRange = ActiveSheet.Range("B59")
+    strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+    
+    ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+    
+   'Maturity Entity2 Filter
+    ActiveWorkbook.Sheets(TabName).Activate
+    Set strDataRange = ActiveSheet.Range("A1:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    Selection.AutoFilter
+    strDataRange.Select
+    Selection.AutoFilter
+    If Entity2 = "All" Then
+        Selection.AutoFilter
+    Else
+        Selection.AutoFilter Field:=1, Criteria1:=Entity2 'column A
+    End If
+        
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    Set strDataRange = ActiveSheet.Range("A1:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    strDataRange.SpecialCells(xlCellTypeVisible).Select
+    Selection.Copy
+    ActiveWorkbook.Sheets("TempSheet").Activate
+    ActiveSheet.Range("A1").Select
+    ActiveSheet.Paste
+    Set strDataRange = ActiveSheet.Range("A2:G" & Lastrow)
+    Set keyRange = ActiveSheet.Range("G1")
+    Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+
+    If SFXChkBox.Value = True Then
+        Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+        strDataRange.SpecialCells(xlCellTypeVisible).Select
+        Selection.EntireRow.Delete
+        ActiveSheet.Range("A1").Select
+        Selection.AutoFilter
+    End If
+        
+    If OtherPidExcl.Value = True Then
+        Application.Run "Module1.AdditionalExclusions"
+    End If
+        
+    ActiveSheet.Range("A2:F41").Copy
+    ActiveWorkbook.Sheets("Summary").Activate
+    Range("H60").PasteSpecial xlPasteValues
+    Set strDataRange = ActiveSheet.Range("H60:M99")
+    Set keyRange = ActiveSheet.Range("I59")
+    strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+    ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+    RowNum = RowNum + 1
+    TabName = ActiveWorkbook.Sheets("Summary").Range("A1").Offset(RowNum, 0).Value
+    
+    Else
+   'End of Maturity Tab
+
+   'All Other Tabs (Except Maturity tab)
+
+        If ActiveWorkbook.Sheets(TabName).Range("F1").Value = "" Then
+
+            Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+        
+            ActiveSheet.Range("E1:E2").Copy
+            ActiveSheet.Range("F1").Select
+            ActiveSheet.Paste
+            ActiveSheet.Range("F1").Value = "ABS Variance"
+            ActiveSheet.Range("F2").Formula = "=ABS(E2)"
+
+            'Application.ScreenUpdating = False
+
+            ActiveSheet.Range("F2").Copy
+            ActiveSheet.Cells(Rows.Count, 2).End(xlUp).Offset(0, 4).Select
+            ActiveSheet.Range(Selection, Selection.End(xlUp)).Select
+            ActiveSheet.Paste
+
+            Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+            Set keyRange = ActiveSheet.Range("F1")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+
+            'Filter Out Blanks
+            strDataRange.Select
+            Selection.AutoFilter
+            If Entity = "All" Then
+                Selection.AutoFilter
+                Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+            Else
+                Selection.AutoFilter Field:=1, Criteria1:=Entity 'column A
+                Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+            End If
+    
+        End If
+
+    
+        'Entity1 Filter
+         Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+         Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+         Set keyRange = ActiveSheet.Range("F1")
+         strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+         strDataRange.Select
+        If Entity = "All" Then
+            Selection.AutoFilter
+            Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+        Else
+            Selection.AutoFilter Field:=1, Criteria1:=Entity 'column A
+            Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+        End If
+        
+        Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+        Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+        Set keyRange = ActiveSheet.Range("F1")
+        strDataRange.SpecialCells(xlCellTypeVisible).Select
+        Selection.Copy
+        
+        ActiveWorkbook.Sheets("TempSheet").Activate
+        ActiveSheet.Range("A1").Select
+        ActiveSheet.Paste
+        
+        Set strDataRange = ActiveSheet.Range("A2:F" & Lastrow)
+        Set keyRange = ActiveSheet.Range("F1")
+        Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    
+        If SFXChkBox.Value = True Then
+            Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+            strDataRange.SpecialCells(xlCellTypeVisible).Select
+            Selection.EntireRow.Delete
+            ActiveSheet.Range("A1").Select
+            Selection.AutoFilter
+        End If
+        
+        If OtherPidExcl.Value = True Then
+            Application.Run "Module1.AdditionalExclusions"
+        End If
+        
+        ActiveSheet.Range("A2:E41").Copy
+        ActiveWorkbook.Sheets("Summary").Activate
+        
+        'Entity1 paste into Summary tab
+        If RowNum = 2 Then
+            Range("A198").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("A198:F237")
+            Set keyRange = ActiveSheet.Range("B197")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 3 Then
+            Range("A106").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("A106:F145")
+            Set keyRange = ActiveSheet.Range("B105")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 4 Then
+            Range("A152").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("A152:F191")
+            Set keyRange = ActiveSheet.Range("B151")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 6 Then
+            Range("A244").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("A244:F283")
+            Set keyRange = ActiveSheet.Range("B243")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 7 Then
+            Range("A290").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("A290:F329")
+            Set keyRange = ActiveSheet.Range("B289")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        End If
+    
+        ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+        
+        'Entity2 Filter
+        ActiveWorkbook.Sheets(TabName).Activate
+        Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+        Set keyRange = ActiveSheet.Range("F1")
+        strDataRange.Select
+        Selection.AutoFilter
+        If Entity2 = "All" Then
+            Selection.AutoFilter
+            Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+        Else
+            Selection.AutoFilter Field:=1, Criteria1:=Entity2, Field:=4, Criteria1:="<>" 'column A
+            Selection.AutoFilter Field:=4, Criteria1:="<>" 'column D
+        End If
+        
+        Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+        Set strDataRange = ActiveSheet.Range("A1:F" & Lastrow)
+        Set keyRange = ActiveSheet.Range("F1")
+        strDataRange.SpecialCells(xlCellTypeVisible).Select
+        Selection.Copy
+        ActiveWorkbook.Sheets("TempSheet").Activate
+        ActiveSheet.Range("A1").Select
+        ActiveSheet.Paste
+        Set strDataRange = ActiveSheet.Range("A2:F" & Lastrow)
+        Set keyRange = ActiveSheet.Range("F1")
+        Lastrow = ActiveSheet.Cells(Rows.Count, "B").End(xlUp).Row
+    
+        If SFXChkBox.Value = True Then
+            Selection.AutoFilter Field:=2, Criteria1:=Array(SFX1, SFX2, SFX3), Operator:=xlFilterValues
+            strDataRange.SpecialCells(xlCellTypeVisible).Select
+            Selection.EntireRow.Delete
+            ActiveSheet.Range("A1").Select
+            Selection.AutoFilter
+        End If
+        
+        If OtherPidExcl.Value = True Then
+            Application.Run "Module1.AdditionalExclusions"
+        End If
+        
+        ActiveSheet.Range("A2:E41").Copy
+        ActiveWorkbook.Sheets("Summary").Activate
+    
+        'Entity2 paste into Summary tab
+        If RowNum = 2 Then
+            Range("H198").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("H198:M237")
+            Set keyRange = ActiveSheet.Range("I197")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 3 Then
+            Range("H106").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("H106:M145")
+            Set keyRange = ActiveSheet.Range("I105")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 4 Then
+            Range("H152").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("H152:M191")
+            Set keyRange = ActiveSheet.Range("I151")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 6 Then
+            Range("H244").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("H244:M283")
+            Set keyRange = ActiveSheet.Range("I243")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        ElseIf RowNum = 7 Then
+            Range("H290").PasteSpecial xlPasteValues
+            Set strDataRange = ActiveSheet.Range("H290:M329")
+            Set keyRange = ActiveSheet.Range("I289")
+            strDataRange.Sort Key1:=keyRange, Order1:=xlDescending
+        End If
+    
+        ActiveWorkbook.Sheets("TempSheet").Range("A:L").Delete
+        RowNum = RowNum + 1
+        TabName = ActiveWorkbook.Sheets("Summary").Range("A1").Offset(RowNum, 0).Value
+
+    End If
+
+
+Loop
+
+ActiveWorkbook.Sheets("PID").Activate 
+ActiveSheet.Range("A1").Select 
+Selection.AutoFilter 
+ActiveSheet.Range("L2:M3").Copy 
+ActiveWorkbook.Sheets("Summary").Activate 
+ActiveSheet.Range("G2:H3").Select 
+ActiveSheet.Paste 
+ActiveSheet.Range("G2:H3").Select 
+MsgBox RnmdFiles & "Summary Updated Successfully", vbInformation, "Done!"
+
+End Sub

@@ -1,0 +1,40 @@
+'4. RENAME Multiple PDF Files
+
+Private Sub CommandButton1_Click()
+
+Dim MyFolder As String
+Dim MyFile As String
+Dim i As Long
+Dim MyOldFile As String
+Dim MyNewFile As String
+Dim InvName As String
+Dim CellNum As Integer
+Dim ReName As String
+
+MyFolder = ActiveWorkbook.Sheets("Macro").Range("B2")
+
+CellNum = 7
+i = 7
+
+InvName = ActiveWorkbook.Sheets("Macro").Range("G" & CellNum)
+
+ReName = ActiveWorkbook.Sheets("Macro").Range("I" & CellNum)
+
+MyFile = Dir(MyFolder & "\" & InvName & ".pdf")
+
+Do Until CellNum = 28
+    MyFolder = ActiveWorkbook.Sheets("Macro").Range("B2")
+    InvName = ActiveWorkbook.Sheets("Macro").Range("G" & CellNum)
+    ReName = ActiveWorkbook.Sheets("Macro").Range("I" & CellNum)
+    MyFile = Dir(MyFolder & "\" & InvName & ".pdf")
+    MyOldFile = MyFolder & "\" & MyFile
+    MyNewFile = MyFolder & "\" & ReName & ".pdf"
+    On Error GoTo ErrorHandler
+    Name MyOldFile As MyNewFile
+    On Error GoTo ErrorHandler
+    MyFile = Dir
+    CellNum = CellNum + 1
+Loop
+ErrorHandler: Exit Sub Resume Next
+
+End Sub
